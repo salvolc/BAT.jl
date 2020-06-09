@@ -1,9 +1,6 @@
 # This file is a part of BAT.jl, licensed under the MIT License (MIT).
 
 
-# ToDo: Add `density_logvalgrad!` to support HMC, etc.
-
-
 @doc doc"""
     AbstractDensity
 
