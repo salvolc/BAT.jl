@@ -26,6 +26,10 @@ mcmc_tuning_finalize!!(::NoMCMCTransformTuningState, ::MCMCChainState) = nothing
 
 mcmc_tune_post_step!!(tuner::NoMCMCTransformTuningState, chain_state::MCMCChainState, ::Real) = chain_state, tuner, false
 
+tune_mcmc_transform!!(tuner::NoMCMCTransformTuningState,transform,
+p_accept::Vector,z_proposed::AbstractArray, #TODO: use DensitySamples instead
+z_current::AbstractArray,stepno::Int,context::BATContext)= return (tuner, transform)
+#Should not be needed afterwards
 
 
 """

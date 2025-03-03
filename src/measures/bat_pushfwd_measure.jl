@@ -65,9 +65,9 @@ _bat_pulbck(f, m::BATMeasure, volcorr::PushFwdStyle) = MeasureBase.pushfwd(inver
 
 
 # ToDo: remove
-function (f::DistributionTransform)(m::AbstractMeasure; volcorr::Val{vc} = Val(true)) where vc
-    throw(ErrorException("`(f::BAT.DistributionTransform)(measure)` is no longer supported, use `MeasureBase.pushfwd(f, measure)` instead."))
-end
+# function (f::DistributionTransform)(m::AbstractMeasure; volcorr::Val{vc} = Val(true)) where vc
+#     throw(ErrorException("`(f::BAT.DistributionTransform)(measure)` is no longer supported, use `MeasureBase.pushfwd(f, measure)` instead."))
+# end
 
 
 #!!!!!!!!! Use return type of f with testvalue, if no shape change return varshape(m.orig) directly

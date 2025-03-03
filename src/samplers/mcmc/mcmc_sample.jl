@@ -75,6 +75,12 @@ bat_default(::TransformedMCMC, ::Val{:burnin}, ::AbstractTransformTarget, nchain
     MCMCMultiCycleBurnin(nsteps_per_cycle = max(div(nsteps, 10), 2500))
 
 function bat_sample_impl(m::BATMeasure, samplingalg::TransformedMCMC, context::BATContext)
+
+    if(samplingalg.adaptive_transform isa CustomTransform)
+        println("Using ensembles to sample with flows!")
+        return bat_sample_impl_ensemble(m,samplingalg,context)
+    end
+
     transformed_m, f_pretransform = transform_and_unshape(samplingalg.pretransform, m, context)
 
     mcmc_states, chain_outputs = mcmc_init!(

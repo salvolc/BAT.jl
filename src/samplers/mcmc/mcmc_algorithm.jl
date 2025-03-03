@@ -211,6 +211,74 @@ function Base.show(io::IO, mc_state::MCMCIterator)
     print(io, ")") 
 end
 
+"""
+    BAT.TransformedMCMCSampleGenerator
+
+*BAT-internal, not part of stable public API.*
+
+MCMC sample generator.
+
+Constructors:
+
+```julia
+TransformedMCMCSampleGenerator(chain::AbstractVector{<:MCMCIterator})
+```
+"""
+struct TransformedMCMCSampleGenerator{
+    T<:AbstractVector{<:MCMCIterator},
+    A<:AbstractSamplingAlgorithm,
+} <: AbstractSampleGenerator
+    chains::T
+    algorithm::A
+end
+
+getalgorithm(sg::TransformedMCMCSampleGenerator) = sg.algorithm
+
+function Base.show(io::IO, generator::TransformedMCMCSampleGenerator)
+    if get(io, :compact, false)
+        print(io, nameof(typeof(generator)), "(")
+        if !isempty(generator.chains)
+            show(io, first(generator.chains))
+            print(io, ", …")
+        end
+        print(io, ")")
+    else
+        println(io, nameof(typeof(generator)), ":")
+        chains = generator.chains
+        nchains = length(chains)
+        n_tuned_chains = count(c -> c.info.tuned, chains)
+        n_converged_chains = count(c -> c.info.converged, chains)
+        print(io, "algorithm: ")
+        show(io, "text/plain", getalgorithm(generator))
+        println(io)
+        println(io, "number of chains:", repeat(' ', 12), nchains)
+        println(io, "number of chains tuned:", repeat(' ', 6), n_tuned_chains)
+        println(io, "number of chains converged:", repeat(' ', 2), n_converged_chains)
+        println(io, "number of points…")
+        println(io, repeat(' ',10), "… in 1th chain:", repeat(' ', 4), nsamples(first(chains)))
+        print(io, repeat(' ',10), "… on average:", repeat(' ', 6), div(sum(nsamples.(chains)), nchains))
+    end
+end
+
+
+function bat_report!(md::Markdown.MD, generator::TransformedMCMCSampleGenerator)
+    mcalg = getalgorithm(generator)
+    chains = generator.chains
+    nchains = length(chains)
+    n_tuned_chains = count(c -> c.info.tuned, chains)
+    n_converged_chains = count(c -> c.info.converged, chains)
+
+    markdown_append!(md, """
+    ### Sample generation
+
+    * Algorithm: MCMC, $(nameof(typeof(mcalg)))
+    * MCMC chains: $nchains ($n_tuned_chains tuned, $n_converged_chains converged)
+    """)
+
+    return md
+end
+
+
 
 function getproposal end
 
